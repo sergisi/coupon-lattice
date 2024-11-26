@@ -1,0 +1,39 @@
+#+title: Coupon Lattice
+
+
+* Reptes
+Hi ha 4 reptes per a fer en aquest projecte:
+
+1. Passar de falcon.py al context.
+2. BDLOP commitment tan de dos tiers com de tres.
+3. La creació dels multi-cupons
+4. Redimir un Token
+
+Em centraré primer amb el commitment de BDLOP. Crec
+que es la part que o bé és molt senzilla o bé me
+donarà per sac durant tot el desenvolupament.
+
+La gràcia és fer primer el desenvolupament del test
+del verify, ja que crec que es poden falsificar, -comprovant
+que funciona sense necessitat d'implementar la funcionalitat-.
+
+La segona part sera la signatura de falcon. Hi ha un problema
+en passar la meva representació dels elements (Sagemath) i
+després utilitzar la de falcon.py.
+
+A partir d'alla fer el protocol sera menys un repte i mes
+feina.
+
+* DONE falcon.py <-> Token redemption
+
+* PROJ BDLOP Commitment
+
+
+#+begin_src plantuml :file bdlop.png
+Alice -> Bob: <latex>Y = A_1a_1 + A_2a_2 <latex/>
+Bob -> Alice: <latex>c<latex/>
+Alice -> Alice: <latex>z_i = a_1 + c b_i <latex/>
+Alice -> Bob: <latex>z_i<latex/>
+Bob -> Bob: <latex>A_1 z_1 + A_2 z_2 = Y + ct
+
+#+end_src
