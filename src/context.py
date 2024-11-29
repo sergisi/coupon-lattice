@@ -192,6 +192,7 @@ def gotta_go_fast_context():
         small_max_value=2,
     )
 
+
 ##########################
 def to_numpy(f):
     return np.array([np.array(list(x), dtype=np.int_) for x in f.coefficients()])

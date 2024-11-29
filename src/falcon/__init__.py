@@ -9,12 +9,10 @@ Falcon(ctx.degree), and only Falcon1024.
 A is also shown as a Matrix when created.
 """
 
-from . import ntt
 from .falcon import SecretKey
 from ..context import Context
 import functools as fun
-from sage.all import matrix
-from os import urandom
+from sage.all import vector
 
 
 class MyFalcon(SecretKey):
@@ -23,16 +21,16 @@ class MyFalcon(SecretKey):
     def __init__(self, ctx: Context):
         self.ctx = ctx
         super().__init__(n=ctx.degree)
-    
+
     @fun.cached_property
     def A(self):
-        return matrix([[1, self.h]], base_ring=self.ctx.ZpxQ)
+        return vector([1, self.h], self.ctx.ZpxQ)
 
     def to_falcon_point(self, message):
         return self.ctx.collapse_even(message)
 
     def to_sagemath_vector(self, s):
-        return matrix([[si] for si in s], base_ring=self.ctx.ZpxQ)
+        return vector(s, self.ctx.ZpxQ)
 
     def my_sign(self, message):
         """
@@ -61,9 +59,9 @@ class MyFalcon(SecretKey):
         """
         Verify a signature.
         """
-        norm_sign = sum(coef**2 for coef in self.ctx.collapse_even(s[0][0]))
-        norm_sign += sum(coef**2 for coef in self.ctx.collapse_even(s[1][0]))
+        norm_sign = sum(coef**2 for coef in self.ctx.collapse_even(s[0]))
+        norm_sign += sum(coef**2 for coef in self.ctx.collapse_even(s[1]))
         h_poly = self.ctx.ZpxQ(self.h)
-        s0 = s[0][0]
-        s1 = s[1][0]
+        s0 = s[0]
+        s1 = s[1]
         return norm_sign <= self.signature_bound and message - h_poly * s1 == s0
