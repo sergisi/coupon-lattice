@@ -4,7 +4,7 @@ from sage.all_cmdline import (
     Integers,
     Zp,
     randint,
-    matrix,
+    vector,
     sqrt,
 )  # import sage library
 import math
@@ -25,11 +25,19 @@ class Context:
 
     p: int
     degree: int
-    n: int
     m: int
     cbd_noise: int
     small_degree: int
     small_max_value: int
+    rej_sampling_module: int
+
+    @functools.cached_property
+    def rej_sampling_s(self):
+        return 0.675 * 2 * self.degree * (self.rej_sampling_module)
+
+    @functools.cached_property
+    def rej_sampling_bound(self):
+        return self.rej_sampling_s * sqrt(2 * self.degree)
 
     def update(self, **kwargs) -> "Context":
         return Context(**(dto.asdict(self) | kwargs))
@@ -64,24 +72,10 @@ class Context:
     def random_element(self):
         return self.ZpxQ([self.Zp(randint(0, self.p - 1)) for _ in range(self.degree)])
 
-    def random_matrix(self):
-        m = matrix(self.ZpxQ, self.n, self.m)
-        for i in range(self.n):
-            for j in range(self.m):
-                m[i, j] = self.random_element()
-        return m
-
-    def random_vector_row(self):
-        m = matrix(self.ZpxQ, 1, self.n)
-        for i in range(self.n):
-            m[0, i] = self.random_element()
-        return m
-
-    def random_vector_column(self):
-        m = matrix(self.ZpxQ, self.n, 1)
-        for i in range(self.n):
-            m[i, 0] = self.random_element()
-        return m
+    def random_vector(self):
+        return vector(
+            [self.random_element() for _ in range(self.m)], self.ZpxQ, immutable=True
+        )
 
     ##########################
 
@@ -93,34 +87,16 @@ class Context:
             rand_function = self.rand_function
         return self.ZpxQ([rand_function() for _ in range(self.small_degree + 1)])
 
-    def random_vector_row_small(
+    def random_vector_small(
         self,
         size: int | None = None,
         rand_element: typing.Callable[[], int] | None = None,
     ):
         if size is None:
-            size = self.n
+            size = self.m
         if rand_element is None:
             rand_element = lambda: self.random_element_small()
-        m = matrix(self.ZpxQ, 1, size)
-        for i in range(size):
-            m[0, i] = rand_element()
-        return m
-
-    def random_vector_column_small(
-        self,
-        size: int | None = None,
-        rand_element: typing.Callable[[], int] | None = None,
-    ):
-
-        if size is None:
-            size = self.n
-        if rand_element is None:
-            rand_element = lambda: self.random_element_small()
-        m = matrix(self.ZpxQ, size, 1)
-        for i in range(size):
-            m[i, 0] = rand_element()
-        return m
+        return vector([rand_element() for _ in range(size)], self.ZpxQ, immutable=True)
 
     @functools.cached_property
     def get_gauss(self) -> typing.Callable[[int], typing.Callable[[], int]]:
@@ -141,15 +117,20 @@ class Context:
             return self.get_gauss(n)()
         return self.random_element_small(rand_function=lambda: self.cbd(n))
 
-    def r_small_col(self, n: int):
-        return self.random_vector_column_small(
+    def r_small_vector(self, n: int | None = None):
+        if n is None:
+            n = self.m
+        return self.random_vector_small(
             size=self.m, rand_element=lambda: self.r_small(n)
         )
 
-    def collapse_even(self, v) -> list[int]:
+    def collapse_even_gen(self, v) -> typing.Generator[int, None, None]:
         p2 = self.p // 2
         m2 = (int(c) if int(c) <= p2 else int(c) - self.p for c in v)
-        return [int(c) for c in m2]
+        return (int(c) for c in m2)
+
+    def collapse_even(self, v) -> list[int]:
+        return list(self.collapse_even_gen(v))
 
     def collapse(self, v):
         """In this protocol, it is based on the second
@@ -172,11 +153,11 @@ def get_context():
     return Context(
         p=Integer(12 * 1024 + 1),
         degree=1024,
-        n=1,
         m=2,
         cbd_noise=2,
         small_degree=1024,
         small_max_value=2,
+        rej_sampling_module=5,
     )
 
 
@@ -185,11 +166,11 @@ def gotta_go_fast_context():
     return Context(
         p=Integer(12 * 1024 + 1),
         degree=64,
-        n=1,
         m=2,
         cbd_noise=2,
         small_degree=64,
         small_max_value=2,
+        rej_sampling_module=5,
     )
 
 
