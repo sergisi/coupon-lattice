@@ -15,3 +15,9 @@ class AjtaiTest(unittest.TestCase):
         vectors = [self.ctx.r_small_vector() for _ in range(2)]
         commitment = ajtai_commitment(matrices, vectors, self.ctx)
         self.assertTrue(commitment())
+
+    def test_ajtai_3vectors(self):
+        matrices = [self.ctx.random_vector() for _ in range(3)]
+        vectors = [self.ctx.r_small_vector() for _ in range(3)]
+        commitment = ajtai_commitment(matrices, vectors, self.ctx)
+        self.assertTrue(commitment())
