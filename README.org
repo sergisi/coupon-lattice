@@ -25,8 +25,7 @@ A partir d'alla fer el protocol sera menys un repte i mes
 feina.
 
 * DONE falcon.py <-> Token redemption
-
-* PROJ BDLOP Commitment
+* DONE BDLOP Commitment
 
 
 #+begin_src plantuml :file bdlop.png
@@ -37,3 +36,10 @@ Alice -> Bob: <latex>z_i<latex/>
 Bob -> Bob: <latex>A_1 z_1 + A_2 z_2 = Y + ct
 
 #+end_src
+
+
+* Canvis
+** Set-Up
+- No estem a Module si no a Ring, N i M son innecessaris.
+
+* Creation

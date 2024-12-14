@@ -147,6 +147,25 @@ class Context:
         v3 = (0 if coef < q4 else 1 for coef in v2)
         return tuple(v3)
 
+    def get_mask_of_element(self, v):
+        p = self.p
+        q2 = p // 2
+        v1 = (int(coef) % p for coef in v)
+        v2 = (coef if coef < q2 else p - coef for coef in v1)
+        q4 = q2 // 2
+        v3 = (abs(coef - q4) for coef in v2)
+        v4 = ((c, i) for i, c in enumerate(v3))
+        v5 = list(filter(lambda x: x[0] > 2000, v4))
+        res = random.sample(v5, k=self.degree // 4)
+        # gotta_go_fast breaks if not
+        # but on normal executions it will still be 256
+        res = [i for _, i in res]
+        res = sorted(res)
+        return res
+
+    def apply_mask(self, ls, mask):
+        return sum(x * 2**i for x, i in enumerate(ls[i] for i in mask))
+
 
 @functools.lru_cache
 def get_context():
