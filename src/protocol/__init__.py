@@ -45,11 +45,12 @@ def set_up(ctx: Context) -> Protocol:
     """
     falc = falcon.MyFalcon(ctx)
     x = ctx.r_small()
-    r = x * falc.A + ctx.r_small_vector()
+    b1_mat = ctx.random_vector()
+    r = x * b1_mat + ctx.r_small_vector()
     pk = PublicKey(
         a_mat=falc.A,
         b0_mat=ctx.random_vector(),
-        b1_mat=ctx.random_vector(),
+        b1_mat=b1_mat,
         b2_mat=ctx.random_vector(),
         r=r,
     )

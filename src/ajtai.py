@@ -87,6 +87,9 @@ class AjtaiCommitment:
 def ajtai_commitment(
     matrices: list, vectors: list, ctx: Context, *, tries: int = 200
 ) -> AjtaiCommitment:
+    """
+    Creates an Ajtai Commimement Correctly
+    """
     assert len(matrices) == len(vectors)
     _hash_to_point = _hash_to_point_factory(
         ctx.random_vector(), ctx.rej_sampling_module

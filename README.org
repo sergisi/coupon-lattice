@@ -34,7 +34,6 @@ Bob -> Alice: <latex>c<latex/>
 Alice -> Alice: <latex>z_i = a_1 + c b_i <latex/>
 Alice -> Bob: <latex>z_i<latex/>
 Bob -> Bob: <latex>A_1 z_1 + A_2 z_2 = Y + ct
-
 #+end_src
 
 
@@ -43,3 +42,13 @@ Bob -> Bob: <latex>A_1 z_1 + A_2 z_2 = Y + ct
 - No estem a Module si no a Ring, N i M son innecessaris.
 
 * Creation
+
+* Protocol Refatctor
+- Tipus que s'utilitzen sovint: ~PolyVec~ i ~Poly~
+- DTOS: PK, AESCyphertext
+- Issuer
+- OpenToken
+- ClosedToken
+- TokenChain
+- Customer
+- Protocol
