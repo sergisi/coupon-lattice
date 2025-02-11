@@ -6,19 +6,45 @@ from typing import Any
 from sage.all import vector
 from .context import Context
 import numpy as np
-
+from Crypto.Hash import SHAKE256
 
 type PolyVec = Any
 type Poly = Any
 
+def _message_to_bytes(message: Poly, ctx: Context):
+    for v in (int(c) for c in message):
+        while v != 0:
+            yield v % 256
+            v = v >> 8
 
-@fun.lru_cache
-def _hash_to_point_factory(matrix, module):
-    def f(w: PolyVec):
-        res = matrix * vector([1, w])
-        return [int(r) % module for r in res]
 
-    return f
+def hash_to_point(message, ctx: Context):
+    """
+    Hash a message to a point in Z[x] mod(Phi, q).
+    Inspired by the Parse function from NewHope.
+    """
+    n = ctx.degree
+    if ctx.p > (1 << 16):
+        raise ValueError("The modulus is too large")
+
+    k = (1 << 16) // ctx.p
+    # Create a SHAKE object and hash the salt and message.
+    shake = SHAKE256.new()
+    shake.update(ctx.salt)
+    message_bytes = bytes(_message_to_bytes(message, ctx))
+    shake.update(message_bytes)
+    # Output pseudorandom bytes and map them to coefficients.
+    hashed = [0 for i in range(n)]
+    i = 0
+    while i < n:
+        # Takes 2 bytes, transform them in a 16 bits integer
+        twobytes = shake.read(1)
+        elt = twobytes[0]
+        # Implicit rejection sampling
+        if elt < k * ctx.p:
+            hashed[i] = elt % ctx.rej_sampling_module
+            i += 1
+    return hashed
 
 
 def _to_array(vs: PolyVec, ctx: Context):
@@ -85,19 +111,16 @@ class AjtaiCommitment:
 
 
 def ajtai_commitment(
-    matrices: list, vectors: list, ctx: Context, *, tries: int = 200
+    matrices: list, vectors: list, ctx: Context, *, tries: int = 500
 ) -> AjtaiCommitment:
     """
     Creates an Ajtai Commimement Correctly
     """
     assert len(matrices) == len(vectors)
-    _hash_to_point = _hash_to_point_factory(
-        ctx.random_vector(), ctx.rej_sampling_module
-    )
     for _ in range(tries):
         ys = [ctx.r_small_vector() for _ in matrices]
         w = sum(A * y for A, y in zip(matrices, ys))
-        c = ctx.ZpxQ(_hash_to_point(w))
+        c = ctx.ZpxQ(hash_to_point(w, ctx))
         zs = _gen_zs(c, ys, vectors, ctx)
         if zs is not None:
             return AjtaiCommitment(

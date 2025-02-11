@@ -54,5 +54,4 @@ class Customer:
         mask = token_chain.head.mask
         partial_key = self.ctx.apply_mask(self.ctx.collapse(expected), mask)
         next_key = hash((token_chain.head.key, partial_key))
-        print(f"Redeemed key = {(token_chain.head.key, partial_key)}")
         return token_chain.open(next_key)

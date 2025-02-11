@@ -29,14 +29,13 @@ class Issuer:
             assert msg(), "pi_t not generated correctly!"
             expected = self.x * msg.t
             mask = self.ctx.get_mask_of_element(expected)
-            partial_key = self.ctx.apply_mask(self.ctx.collapse(expected), mask)
-            next_key = hash((key, partial_key))
-            print(f"NextKey = {(key, partial_key)}")
             b3 = self.ctx.r_small_vector()
             s = self.falcon.my_sign(msg.t + self.pk.b2_mat * b3)
             c = aes(b3, s, key=key)
-            key = next_key
             msg = yield c, mask
+            partial_key = self.ctx.apply_mask(self.ctx.collapse(expected), mask)
+            next_key = hash((key, partial_key))
+            key = next_key
 
     def redeem_token(self, nizk: AjtaiCommitment, m: PolyVec) -> Poly:
         assert nizk(), "nizk not generated correctly"

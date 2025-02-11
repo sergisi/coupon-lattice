@@ -16,6 +16,7 @@ from sage.stats.distributions.discrete_gaussian_polynomial import (
     DiscreteGaussianDistributionPolynomialSampler as DisGauss,
 )
 from .falcon_params import params
+from os import urandom
 
 
 @dto.dataclass
@@ -31,6 +32,10 @@ class Context:
     small_degree: int
     small_max_value: int
     rej_sampling_module: int
+
+    @functools.cached_property
+    def salt(self) -> bytes:
+        return urandom(40)  # 40 bytes of randomness
 
     @functools.cached_property
     def rej_sampling_s(self):
