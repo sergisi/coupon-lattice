@@ -9,7 +9,7 @@ import cProfile
 import time
 
 
-def main(tokens: int = 10):
+def main(tokens: int = 1000):
     """
     Generates 1000 coupons and then uses them. Prints the time of
     the set-up, the generation, and the redemption.
@@ -27,4 +27,5 @@ def main(tokens: int = 10):
 
 
 if __name__ == "__main__":
-    cProfile.run('main()')
+    main()
+    # cProfile.run('main()')
