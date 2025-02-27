@@ -26,6 +26,23 @@ def main(tokens: int = 1000):
     print(t1 - t0, t2 - t1, t3 - t2)
 
 
+def generate_noise_one():
+    ctx = get_context()
+    a = ctx.r_small()
+    b = ctx.r_small_vector()
+    c = ctx.r_small_vector()
+    v = a + b * c
+    p = ctx.p
+    q2 = p // 2
+    v1 = (int(coef) % p for coef in v)
+    v2 = (coef if coef < q2 else coef-p for coef in v1)
+    v3 = (abs(coef) for coef in v2)
+    return max(v3)
+
+def generate_noise(times: int = 1000):
+    return max((generate_noise_one() for _ in range(times)))
+
+
 if __name__ == "__main__":
     main()
     # cProfile.run('main()')

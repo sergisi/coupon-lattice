@@ -4,7 +4,6 @@ from src.protocol import AESCyphertext, set_up, Issuer, Customer, Protocol
 from src.context import Context, get_context, gotta_go_fast_context
 
 
-@unittest.skip('Ajtai does work badly in smaller fields')
 class TestProtocolFast(unittest.TestCase):
     ctx: Context
     protocol: Protocol

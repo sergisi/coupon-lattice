@@ -14,6 +14,7 @@ def get_context():
         small_degree=1024,
         small_max_value=2,
         rej_sampling_module=5,
+        safe_mask=300,
     )
 
 
@@ -27,6 +28,7 @@ def gotta_go_fast_context():
         small_degree=64,
         small_max_value=2,
         rej_sampling_module=5,
+        safe_mask=300,
     )
 
 
