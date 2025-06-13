@@ -13,7 +13,7 @@ it does not make any sense to implement it.
 import dataclasses as dto
 
 from src import falcon
-from src.context import Context
+from src.context import SignatureContext
 from .issuer import Issuer
 from .customer import Customer
 from .pk import PublicKey, aes, AESCyphertext
@@ -36,12 +36,17 @@ class Protocol:
 
     issuer: Issuer
     customer: Customer
-    ctx: Context
+    ctx: SignatureContext
 
 
-def set_up(ctx: Context) -> Protocol:
+def set_up(ctx: SignatureContext) -> Protocol:
     """
     Sets up the relevant actors and their keys.
+
+    Memory: 
+    Issuer: 5v + e + falcon
+    Customer: 5v 
+    NOTE: pk = 5v
     """
     falc = falcon.MyFalcon(ctx)
     x = ctx.r_small()

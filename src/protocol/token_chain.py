@@ -7,18 +7,31 @@ from src.poly import PolyVec
 from src.protocol.pk import AESCyphertext
 
 
+# All
+
 @dto.dataclass
 class OpenToken:
+    """
+
+    Memory: 4v
+    Note: mask and key here for testing. DO NOT PUT
+    THEM IN PRODUCTION
+    """
     m: PolyVec
     b: PolyVec
     b2: PolyVec
     s: PolyVec
     mask: list[int]
-    key: int
+    key: int 
 
 
 @dto.dataclass
 class ClosedToken:
+    """
+
+    Memory: 2v + 2v' + 32
+    v' is the ceil(2v / 32) * 32 in bytes (for aes cyphertext).
+    """
     m: PolyVec
     b: PolyVec
     c: AESCyphertext

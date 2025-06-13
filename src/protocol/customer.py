@@ -1,6 +1,6 @@
 import dataclasses as dto
 from .pk import PublicKey
-from src.context import Context
+from src.context import SignatureContext
 import collections
 from src import ajtai
 from .token_chain import TokenChain, ClosedToken, OpenToken
@@ -15,11 +15,27 @@ class Customer:
     """
 
     pk: PublicKey
-    ctx: Context
+    ctx: SignatureContext
 
     def generate_n_coupons(
         self, issuer: Issuer, n_tokens: int, initial_key: int | None = None
     ) -> TokenChain:
+        """
+        Memory:
+
+        Customer
+        - 32 bytes
+        - nizk: 2v
+        - closed token
+
+        Issuer:
+        - AEScy
+        - 2 keys
+
+        Communication:
+        - NIZK2v ->
+        - <- AEScy
+        """
         if initial_key is None:
             key = secrets.randbits(256)
         else:
@@ -41,6 +57,15 @@ class Customer:
     def redeem_token(
         self, issuer: Issuer, token_chain: TokenChain
     ) -> TokenChain | None:
+        """
+        Memory 
+        - NIZK Commitment
+        - key = 256 bits
+        - one element
+        Communication:
+        - NIZK (3 vectors) ->
+        - <- r (element)
+        """
         nizk = ajtai.ajtai_commitment(
             [self.pk.a_mat, self.pk.b1_mat, self.pk.b2_mat],
             [token_chain.head.s, -token_chain.head.b, -token_chain.head.b2],

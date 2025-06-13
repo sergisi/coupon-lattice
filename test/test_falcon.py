@@ -1,5 +1,5 @@
 import unittest
-from src.context import Context, get_context, gotta_go_fast_context
+from src.context import SignatureContext, get_context, gotta_go_fast_context
 from src.falcon import MyFalcon
 
 

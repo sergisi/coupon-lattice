@@ -3,13 +3,13 @@ import unittest
 from sage.all import vector
 
 from src.ajtai import ajtai_commitment
-from src.context import Context, gotta_go_fast_context
+from src.context import SignatureContext, gotta_go_fast_context
 
 from src.falcon import MyFalcon
 
 
 class AjtaiTest(unittest.TestCase):
-    ctx: Context
+    ctx: SignatureContext
 
     def setUp(self) -> None:
         self.ctx = gotta_go_fast_context()

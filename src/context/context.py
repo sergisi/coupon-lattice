@@ -20,9 +20,10 @@ from os import urandom
 
 
 @dto.dataclass
-class Context:
+class SignatureContext:
     """
-    Parameters that get passed down in the function calls.
+    Space where the falcon and the blind signature work.
+
     """
 
     p: int
@@ -33,6 +34,7 @@ class Context:
     small_max_value: int
     rej_sampling_module: int
     safe_mask: int
+
 
     @functools.cached_property
     def salt(self) -> bytes:
@@ -48,8 +50,8 @@ class Context:
             self.rej_sampling_s * sqrt(2 * self.degree), params[self.degree].sig_bound
         )
 
-    def update(self, **kwargs) -> "Context":
-        return Context(**(dto.asdict(self) | kwargs))
+    def update(self, **kwargs) -> "SignatureContext":
+        return SignatureContext(**(dto.asdict(self) | kwargs))
 
     @property
     def len_bits(self):

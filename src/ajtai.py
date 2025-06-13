@@ -4,21 +4,21 @@ import itertools
 from typing import Any
 
 from sage.all import vector
-from .context import Context
+from .context import SignatureContext
 import numpy as np
 from Crypto.Hash import SHAKE256
 
 type PolyVec = Any
 type Poly = Any
 
-def _message_to_bytes(message: Poly, ctx: Context):
+def _message_to_bytes(message: Poly, ctx: SignatureContext):
     for v in (int(c) for c in message):
         while v != 0:
             yield v % 256
             v = v >> 8
 
 
-def hash_to_point(message, ctx: Context):
+def hash_to_point(message, ctx: SignatureContext):
     """
     Hash a message to a point in Z[x] mod(Phi, q).
     Inspired by the Parse function from NewHope.
@@ -47,14 +47,14 @@ def hash_to_point(message, ctx: Context):
     return hashed
 
 
-def _to_array(vs: PolyVec, ctx: Context):
+def _to_array(vs: PolyVec, ctx: SignatureContext):
     return np.array(
         list(itertools.chain.from_iterable(ctx.collapse_even(v) for v in vs)),
         dtype=np.int32,
     )
 
 
-def rej_sampling(z: PolyVec, ca: PolyVec, ctx: Context):
+def rej_sampling(z: PolyVec, ca: PolyVec, ctx: SignatureContext):
     """I do not understand some parts of the rejection sampling
     algorithm
 
@@ -89,18 +89,18 @@ def _gen_zs(c, ys, vectors, ctx):
     return res
 
 
-def norm(z: PolyVec, ctx: Context):
+def norm(z: PolyVec, ctx: SignatureContext):
     return np.linalg.norm(_to_array(z, ctx))
 
 
 @dto.dataclass
 class AjtaiCommitment:
-    w: list
+    w: Poly
     zs: list
     matrices: list
     t: Poly
     c: Poly
-    ctx: Context
+    ctx: SignatureContext
 
     def __call__(self) -> bool:
         return (
@@ -111,7 +111,7 @@ class AjtaiCommitment:
 
 
 def ajtai_commitment(
-    matrices: list, vectors: list, ctx: Context, *, tries: int = 500
+    matrices: list, vectors: list, ctx: SignatureContext, *, tries: int = 500
 ) -> AjtaiCommitment:
     """
     Creates an Ajtai Commimement Correctly

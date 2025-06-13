@@ -3,7 +3,7 @@ import typing
 from src import falcon
 from src.poly import Poly, PolyVec
 from .pk import PublicKey, aes, AESCyphertext
-from src.context import Context
+from src.context import SignatureContext
 from src.ajtai import AjtaiCommitment
 
 
@@ -16,12 +16,21 @@ class Issuer:
     pk: PublicKey
     falcon: falcon.MyFalcon
     x: Poly
-    ctx: Context
+    ctx: SignatureContext
     issued_before: set[PolyVec] = dto.field(default_factory=set)
 
     def multi_coupon_creation(
         self, key: int
     ) -> typing.Generator[tuple[AESCyphertext, list[int]], AjtaiCommitment, None]:
+        """
+
+        Memory: 
+        - AESCy
+        - key: 32+32 bytes (partial and current)
+        
+        Communication
+        - AESCy
+        """
         # It gets whacky in the client if not.
         msg: AjtaiCommitment | None = yield
         while True:
@@ -41,6 +50,6 @@ class Issuer:
         assert nizk(), "nizk not generated correctly"
         assert self.pk.b0_mat * m == nizk.t
         assert m not in self.issued_before
-        self.issued_before.add(m)
+        self.issued_before.add(m) # DB: 32bytes
         # Informs the merchant so that they can perform whatever
         return self.x * self.pk.b0_mat * m + self.ctx.r_small()

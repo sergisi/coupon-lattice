@@ -10,15 +10,15 @@ A is also shown as a Matrix when created.
 """
 
 from .falcon import SecretKey
-from ..context import Context
+from ..context import SignatureContext
 import functools as fun
 from sage.all import vector
 
 
 class MyFalcon(SecretKey):
-    ctx: Context
+    ctx: SignatureContext
 
-    def __init__(self, ctx: Context):
+    def __init__(self, ctx: SignatureContext):
         self.ctx = ctx
         super().__init__(n=ctx.degree)
 

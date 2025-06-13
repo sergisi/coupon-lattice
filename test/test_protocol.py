@@ -1,11 +1,11 @@
 import unittest
 from src import ajtai
 from src.protocol import AESCyphertext, set_up, Issuer, Customer, Protocol
-from src.context import Context, get_context, gotta_go_fast_context
+from src.context import SignatureContext, get_context, gotta_go_fast_context
 
 
 class TestProtocolFast(unittest.TestCase):
-    ctx: Context
+    ctx: SignatureContext
     protocol: Protocol
     issuer: Issuer
     customer: Customer
@@ -51,7 +51,7 @@ class TestProtocolFast(unittest.TestCase):
             token_chain = self.customer.redeem_token(self.issuer, token_chain)
 
 class TestProtocolSlow(TestProtocolFast):
-    ctx: Context
+    ctx: SignatureContext
     protocol: Protocol
     issuer: Issuer
     customer: Customer
